@@ -5,6 +5,9 @@ inputs:
   app_name:
     description: "App name"
     required: true
+  ecr_registry:
+    description: "ECR registry"
+    required: true
   aws_access_key_id:
     description: "AWS access key ID"
     required: true
@@ -17,12 +20,6 @@ inputs:
 runs:
   using: "composite"
   steps: 
-  - name: Set ECR registry name
-    shell: bash
-    id: registry
-    run: |
-      ECR="956868976386.dkr.ecr.us-east-1.amazonaws.com"
-      echo "::set-output name=ecr::${ECR}"
   - name: Set up QEMU
     uses: docker/setup-qemu-action@v1
   - name: Set up Docker Buildx
@@ -30,7 +27,7 @@ runs:
   - name: Login to ECR
     uses: docker/login-action@v1
     with:
-      registry: ${{ steps.registry.outputs.ecr }}
+      registry: ${{ inputs.ecr_registry }}
       username: ${{ inputs.aws_access_key_id }}
       password: ${{ inputs.aws_secret_access_key }}
   - name: Set commit short sha
@@ -51,8 +48,8 @@ runs:
     with:
       push: true
       tags: |
-        ${{ steps.registry.outputs.ecr }}/${{ inputs.app_name }}:${{ steps.refs.outputs.branch_name }}-${{ steps.commit.outputs.sha_short }}
-        ${{ steps.registry.outputs.ecr }}/${{ inputs.app_name }}:${{ steps.refs.outputs.branch_name }}
+        ${{ inputs.ecr_registry }}/${{ inputs.app_name }}:${{ steps.refs.outputs.branch_name }}-${{ steps.commit.outputs.sha_short }}
+        ${{ inputs.ecr_registry }}/${{ inputs.app_name }}:${{ steps.refs.outputs.branch_name }}
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: GITHUB_SSH_KEY=${{ inputs.gh_ssh_key }}
