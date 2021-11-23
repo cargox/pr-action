@@ -17,9 +17,6 @@ inputs:
   gh_ssh_key:
     description: "GitHub SSH key"
     required: true
-  gh_token:
-    description: "GitHub Token"
-    required: true
 runs:
   using: "composite"
   steps: 
@@ -56,4 +53,3 @@ runs:
       cache-from: type=gha
       cache-to: type=gha,mode=max
       build-args: GITHUB_SSH_KEY=${{ inputs.gh_ssh_key }}
-      secrets: GIT_AUTH_TOKEN=${{ inputs.gh_token }}
